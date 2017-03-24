@@ -1,0 +1,21 @@
+pane	0	0	:bash	0	:	1	:/home/tc.luizs	1	bash	:
+pane	0	2	:ssh	0	:	1	:/home/tc.luizs/work/xcp/proj/xcpwdm/src/modalf	1	bash	:
+pane	0	3	:ssh	0	:	1	:/home/tc.luizs	0	bash	:
+pane	0	3	:ssh	0	:	2	:/home/tc.luizs	1	bash	:
+pane	0	3	:ssh	0	:	3	:/home/tc.luizs	0	bash	:
+pane	0	4	:vim	0	:	1	:/home/tc.luizs/work/xcp/proj/xcpwdm/src/modalf	0	bash	:
+pane	0	4	:vim	0	:	2	:/home/tc.luizs/work/xcpwdm	0	bash	:
+pane	0	4	:vim	0	:	3	:/home/tc.luizs/work/xcpwdm	1	vim	:vim README.md
+pane	0	5	:bash	0	:	1	:/home/tc.luizs	1	bash	:
+pane	0	6	:bash	0	:-	1	:/home/tc.luizs/work/xcp/proj/xcpwdm/src/modalf	0	bash	:
+pane	0	6	:bash	0	:-	2	:/home/tc.luizs/work/xcp/proj/xcpwdm/src/modalf	1	bash	:
+pane	0	7	:vim	1	:*	1	:/home/tc.luizs/.tmux/plugins	1	bash	:
+pane	0	7	:vim	1	:*	2	:/home/tc.luizs/personal	0	vim	:vim tmux-onedark-theme/
+window	0	0	0	:	d25d,213x59,0,0,0
+window	0	2	0	:	d25e,213x59,0,0,1
+window	0	3	0	:	c8d6,213x59,0,0{106x59,0,0[106x29,0,0,2,106x29,0,30,3],106x59,107,0,4}
+window	0	4	0	:	67de,213x59,0,0{106x59,0,0,5,106x59,107,0[106x29,107,0,6,106x29,107,30,7]}
+window	0	5	0	:	d265,213x59,0,0,8
+window	0	6	0	:-	5223,213x59,0,0{106x59,0,0,9,106x59,107,0,10}
+window	0	7	1	:*	8aae,213x59,0,0{106x59,0,0,11,106x59,107,0,12}
+state	0	

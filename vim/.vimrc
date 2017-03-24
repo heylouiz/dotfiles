@@ -1,108 +1,51 @@
 "-------------------------------------------------------------------------------
-" Session RAONI 01
+" Vundle
 "-------------------------------------------------------------------------------
 
-" Avoid side effects if `nocp` already set
-" From: http://stackoverflow.com/questions/6286866/how-to-tell-vim-to-store-the-viminfo-file-somewhere-else/39767149#39767149
-if &compatible | set nocompatible | endif
+set nocompatible              " be iMproved, required
+filetype off                  " required
+
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+" alternatively, pass a path where Vundle should install plugins
+"call vundle#begin('~/some/path/here')
+
+" let Vundle manage Vundle, required
+Plugin 'VundleVim/Vundle.vim'
+
+" NerdTree
+Plugin 'scrooloose/nerdtree'
+
+" All of your Plugins must be added before the following line
+call vundle#end()            " required
+filetype plugin indent on    " required
+" To ignore plugin indent changes, instead use:
+"filetype plugin on
+"
+" Brief help
+" :PluginList       - lists configured plugins
+" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
+" :PluginSearch foo - searches for foo; append `!` to refresh local cache
+" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
+"
+" see :h vundle for more details or wiki for FAQ
+" Put your non-Plugin stuff after this line
+
 
 " change ~/.viminfo to a more convenient place
 set viminfo+=n~/.vim/viminfo
 
+"------------
+" Colors
+"------------
 " Force the default colorscheme before anything else
-colorscheme default
+" colorscheme default
 
+" Change line number column to white
+highlight LineNr ctermfg=white
 
-
-"-------------------------------------------------------------------------------
-" Session HEX EDIT improve
-" From: http://vim.wikia.com/wiki/Improved_Hex_editing
-"-------------------------------------------------------------------------------
-
-if has("autocmd")
-  " vim -b : edit binary using xxd-format!
-  augroup Binary
-    au!
-    au BufReadPre *.bin,*.hex setlocal binary
-    au BufReadPost *
-          \ if &binary | exe "Hexmode" | endif
-    au BufWritePre *
-          \ if exists("b:editHex") && b:editHex && &binary |
-          \  exe "%!xxd -r" |
-          \ endif
-    au BufWritePost *
-          \ if exists("b:editHex") && b:editHex && &binary |
-          \  exe "%!xxd" |
-          \  exe "set nomod" |
-          \ endif
-  augroup END
-endif
-
-command Hexmode call ToggleHex()
-function ToggleHex()
-  " hex mode should be considered a read-only operation
-  " save values for modified and read-only for restoration later,
-  " and clear the read-only flag for now
-  let l:modified=&mod
-  let l:oldreadonly=&readonly
-  let &readonly=0
-  if !exists("b:editHex") || !b:editHex
-    " save old options
-    let b:oldft=&ft
-    let b:oldbin=&bin
-    " set new options
-    setlocal binary " make sure it overrides any textwidth, etc.
-    let &ft="xxd"
-    " set status
-    let b:editHex=1
-    " switch to hex editor
-    %!xxd
-  else
-    " restore old options
-    let &ft=b:oldft
-    if !b:oldbin
-      setlocal nobinary
-    endif
-    " set status
-    let b:editHex=0
-    " return to normal editing
-    %!xxd -r
-  endif
-  " restore values for modified and read only state
-  let &mod=l:modified
-  let &readonly=l:oldreadonly
-endfunction
-
-
-
-
-"-------------------------------------------------------------------------------
-" Session LATEX-SUITE improve
-" From: http://vim-latex.sourceforge.net/documentation/latex-suite/recommended-settings.html
-"-------------------------------------------------------------------------------
-
-" REQUIRED: This makes vim invoke Latex-Suite when you open a tex file.
-"filetype plugin on
-
-" IMPORTANT: win32 users will need to have 'shellslash' set so that latex
-" can be called correctly.
-"set shellslash
-
-" IMPORTANT: grep will sometimes skip displaying the file name if you
-" search in a singe file. This will confuse Latex-Suite. Set your grep
-" program to always generate a file-name.
-"set grepprg=grep\ -nH\ $*
-
-" OPTIONAL: This enables automatic indentation as you type.
-"filetype indent on
-
-" OPTIONAL: Starting with Vim 7, the filetype of empty .tex files defaults to
-" 'plaintex' instead of 'tex', which results in vim-latex not being loaded.
-" The following changes the default filetype back to 'tex':
-"let g:tex_flavor='latex'
-
-
-
+highlight Search cterm=NONE ctermfg=black ctermbg=yellow
 
 "-------------------------------------------------------------------------------
 " VIM highlight variable under cursor like in netbeans
@@ -110,9 +53,6 @@ endfunction
 "-------------------------------------------------------------------------------
 
 ":autocmd CursorMoved * silent! exe printf('match IncSearch /\<%s\>/', expand('<cword>'))
-
-
-
 
 "-------------------------------------------------------------------------------
 " Auto highlight current word when idle
@@ -142,304 +82,22 @@ function! AutoHighlightToggle()
   endif
 endfunction
 
-
-
-
-"-------------------------------------------------------------------------------
-" Automatic Saving/Loaging folds and others view settings.
-" From: http://www.linux.com/archive/feature/114138
-" (the code is from the final part of the article and the first comment.)
-"-------------------------------------------------------------------------------
-
-" altomatic save of the view configuration of a file. ex: the folds on a file
-au BufWinLeave ?* mkview
-" altomatic load of the view configuration of a file. ex: the folds on a file
-au BufWinEnter ?* silent loadview
-
-
-
-
-"-------------------------------------------------------------------------------
-" Jeff's cscope settings
-" From: http://www.fsl.cs.sunysb.edu/~rick/rick_vimrc
-" It came from the tutorial about cscope + ctags + vim
-" From: http://www.fsl.cs.sunysb.edu/~rick/cscope.html
-" I made some big reorganization and separate in functions. Also add some
-" comments and comments from other cscope vimrc that is the same but with more
-" comments (maybe it  is the original author)
-" the LoadCScope() function comes from an article in and I transported my
-" alterations to it. Also comes the setupd to call It when load a " buffer.
-" From: http://vim.wikia.com/wiki/Autoloading_Cscope_Database
-"-------------------------------------------------------------------------------
-
-
-" New cscope that do the same as "tags=tags;/", it search upwards in the parent
-" directories for a cscope database, not only the directore of the file. I
-" changed it to load all the ocurrences, not just the first.
-function! LoadCScope()
-    let l:loaded=0
-    set nocscopeverbose " suppress 'duplicate connection' error
-    " add any database in current directory or any parent
-    let dbs = findfile("cscope.out", ".;", -1)
-    if (!empty(dbs))
-        for db in dbs
-            let path = strpart(db, 0, match(db, "/cscope.out$"))
-            exe "cs add " . db . " " . path
-        endfor
-        let l:loaded=1
-    " else add database pointed to by environment variable
-    elseif $CSCOPE_DB != ""
-        cs add $CSCOPE_DB
-        let l:loaded=1
-    endif
-    set cscopeverbose
-    return l:loaded
-endfunction
-
-" TODO: incomplete work on using paths
-function! LoadCScopeFrom(path)
-    if !exists("a:path") || a:path == ""
-        let l:path="."
-    else
-        let l:path=a:path
-    endif
-endfunction
-
-
-function SetCScopeKeyBinds(map)
-" NOTE:
-" These key maps use multiple keystrokes (2 or 3 keys).  If you find that vim
-" keeps timing you out before you can complete them, try changing your timeout
-" settings, as explained below.
-  if a:map
-    """"""""""""" My cscope/vim key mappings
-    "
-    " The following maps all invoke one of the following cscope search types:
-    "
-    "   's'   symbol: find all references to the token under cursor
-    "   'g'   global: find global definition(s) of the token under cursor
-    "   'c'   calls:  find all calls to the function name under cursor
-    "   't'   text:   find all instances of the text under cursor
-    "   'e'   egrep:  egrep search for the word under cursor
-    "   'f'   file:   open the filename under cursor
-    "   'i'   includes: find files that include the filename under cursor
-    "   'd'   called: find functions that function under cursor calls
-    "
-    " Below are three sets of the maps: one set that just jumps to your
-    " search result, one that splits the existing vim window horizontally and
-    " diplays your search result in the new window, and one that does the same
-    " thing, but does a vertical split instead (vim 6 only).
-    "
-    " I've used CTRL-\ and CTRL-@ as the starting keys for these maps, as it's
-    " unlikely that you need their default mappings (CTRL-\'s default use is
-    " as part of CTRL-\ CTRL-N typemap, which basically just does the same
-    " thing as hitting 'escape': CTRL-@ doesn't seem to have any default use).
-    " If you don't like using 'CTRL-@' or CTRL-\, , you can change some or all
-    " of these maps to use other keys.  One likely candidate is 'CTRL-_'
-    " (which also maps to CTRL-/, which is easier to type).  By default it is
-    " used to switch between Hebrew and English keyboard mode.
-    "
-    " All of the maps involving the <cfile> macro use '^<cfile>$': this is so
-    " that searches over '#include <time.h>" return only references to
-    " 'time.h', and not 'sys/time.h', etc. (by default cscope will return all
-    " files that contain 'time.h' as part of their name).
-
-
-    " To do the first type of search, hit 'CTRL-\', followed by one of the
-    " cscope search types above (s,g,c,t,e,f,i,d).  The result of your cscope
-    " search will be displayed in the current window.  You can use CTRL-T to
-    " go back to where you were before the search.
-
-
-    " Using 'CTRL-\' then a search type makes the vim window
-    " "shell-out", with search results displayed on the bottom
-
-    nmap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
-    nmap <C-\>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
-    nmap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>
-
-    " Using 'CTRL-spacebar' then a search type makes the vim window
-    " split horizontally, with search result displayed in
-    " the new window.
-
-    nmap <C-@>s :scs find s <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-@>g :scs find g <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-@>c :scs find c <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-@>t :scs find t <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-@>e :scs find e <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-@>f :scs find f <C-R>=expand("<cfile>")<CR><CR>
-    nmap <C-@>i :scs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
-    nmap <C-@>d :scs find d <C-R>=expand("<cword>")<CR><CR>
-
-    " Hitting CTRL-space *twice* before the search type does a vertical
-    " split instead of a horizontal one
-
-    nmap <C-@><C-@>s :vert scs find s <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-@><C-@>g :vert scs find g <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-@><C-@>c :vert scs find c <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-@><C-@>t :vert scs find t <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-@><C-@>e :vert scs find e <C-R>=expand("<cword>")<CR><CR>
-    nmap <C-@><C-@>f :vert scs find f <C-R>=expand("<cfile>")<CR><CR>
-    nmap <C-@><C-@>i :vert scs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
-    nmap <C-@><C-@>d :vert scs find d <C-R>=expand("<cword>")<CR><CR>
-    """"""""""""" key map timeouts
-    "
-    " By default Vim will only wait 1 second for each keystroke in a mapping.
-    " You may find that too short with the above typemaps.  If so, you should
-    " either turn off mapping timeouts via 'notimeout'.
-    "
-    "set notimeout 
-    "
-    " Or, you can keep timeouts, by uncommenting the timeoutlen line below,
-    " with your own personal favorite value (in milliseconds):
-    "
-    "set timeoutlen=4000
-    "
-    " Either way, since mapping timeout settings by default also set the
-    " timeouts for multicharacter 'keys codes' (like <F1>), you should also
-    " set ttimeout and ttimeoutlen: otherwise, you will experience strange
-    " delays as vim waits for a keystroke after you hit ESC (it will be
-    " waiting to see if the ESC is actually part of a key code like <F1>).
-    "
-    "set ttimeout 
-    "
-    " personally, I find a tenth of a second to work well for key code
-    " timeouts. If you experience problems and have a slow terminal or network
-    " connection, set it higher.  If you don't set ttimeoutlen, the value for
-    " timeoutlent (default: 1000 = 1 second, which is sluggish) is used.
-    "
-    "set ttimeoutlen=100
-  else
-"    let l:keys = ['s', 'g', 'c', 't', 'e', 'f', 'i', 'd']
-"    let l:_mapleader = mapleader
-"    for key in l:keys
-"      let mapleader = key
-"      nunmap <C-\><Leader>
-"      nunmap <C-[><Leader>
-"      nunmap <C-[><C-[><Leader>
-"    endfor
-"    let mapleader = l:_mapleader
-
-    nunmap <C-\>s
-    nunmap <C-\>g
-    nunmap <C-\>c
-    nunmap <C-\>t
-    nunmap <C-\>e
-    nunmap <C-\>f
-    nunmap <C-\>i
-    nunmap <C-\>d
-
-    nunmap <C-@>s
-    nunmap <C-@>g
-    nunmap <C-@>c
-    nunmap <C-@>t
-    nunmap <C-@>e
-    nunmap <C-@>f
-    nunmap <C-@>i
-    nunmap <C-@>d
-
-    nunmap <C-@><C-@>s
-    nunmap <C-@><C-@>g
-    nunmap <C-@><C-@>c
-    nunmap <C-@><C-@>t
-    nunmap <C-@><C-@>e
-    nunmap <C-@><C-@>f
-    nunmap <C-@><C-@>i
-    nunmap <C-@><C-@>d
-  endif
-endfunction
-
-if has("cscope")
-  " not specific to cscope. This is to ctags and will search upwards from the
-  " current directory up to root for "tags" files.
-  " From: http://stackoverflow.com/questions/17336143/using-multiple-tag-files-at-once-in-vim-tag-organisation-in-general
-  set tags=./tags;/,tags;/
-  " specifies the command to execute cscope
-  set csprg=/usr/bin/cscope
-  " change this to 1 to search ctags DBs first
-  set cscopetagorder=0
-  " use both cscope and ctag for 'ctrl-]', ':ta', and 'vim -t'
-  set cscopetag
-  " determines how many components of a file's path to display
-  "set cspc=2
-  " load CScope database everytime opens a file
-  "au BufEnter /* call LoadCScope()
-  if LoadCScope()
-    call SetCScopeKeyBinds(1)
-  endif
-endif
-
-
-"-------------------------------------------------------------------------------
-" How to fill a line with character x up to column y using Vim
-" From: http://stackoverflow.com/questions/3364102/how-to-fill-a-line-with-character-x-up-to-column-y-using-vim
-"-------------------------------------------------------------------------------
-
-"map <silent> <F4> :call FillLine()<cr>
-
-" First answer method
-" From: http://stackoverflow.com/a/3400528
-" - It fills the line from its current end of line, rather than the cursor
-"   position
-" - It forces a single space between what's currently on the line and the
-"   repeated chars
-" - It allows you to specify any string to fill the rest of the line with
-" - It uses vim's textwidth setting to decide how long the line should be
-"   (rather than just assuming 80 chars)
-"function! FillLine(str)
-"    " set tw to the desired total length
-"    let tw = &textwidth
-"    if tw==0 | let tw = 80 | endif
-"    " strip trailing spaces first
-"    .s/[[:space:]]*$//
-"    " calculate total number of 'str's to insert
-"    let reps = (tw - col("$")) / len(a:str)
-"    " insert them, if there's room, removing trailing spaces (though forcing
-"    " there to be one)
-"    if reps > 0
-"        .s/$/\=(' '.repeat(a:str, reps))/
-"    endif
-"endfunction
-
-"Second answer method
-"From: http://stackoverflow.com/a/12412493
-" 80Ax<Esc>d80|
-"function! FillLine(str)
-"    ex 80Pd80|
-"endfunction
-
-"-------------------------------------------------------------------------------
-" Gabs vimrc
-" From: it is in my git repository: ref/gabs-vimrc
-"-------------------------------------------------------------------------------
-
 " Default behavior
-""" --- raoni @ Mon Jan  6 09:53:22 BRST 2014
-""" In the sets below in this session (Default behavior) I put the comments to
-""" explain which each one does.
-""" --- raoni END
-"syntax on         " Set syntax highlight
-"set noautoindent  " Disable autoindent
-"set nocindent     " Disable cindet
-"set nocompatible  " Disable VI compatible mode
-"set hidden        " Buffer becomes Hidden when abandoned intead of be unloaded
-set hlsearch      " Highlight all matches of the last search
-"set ignorecase    " Disable case sensitive in search
-set incsearch     " Highlight matching pattern while typing the search command
-"set showmatch     " Briefly jump and show the matching bracket when inserting one.
-"set nowrap        " Disable text wrap
 
+" Highlight all matches of the last search
+set hlsearch
 
-" Key mappings
-"map <silent> <F6> :call Switchhighlight()<cr>
-map <silent> <F10> :call Switchspell()<cr>
-map <silent> <F8> :call Switchwidth()<cr>
+" Disable case sensitive in search
+"set ignorecase
 
+" Highlight matching pattern while typing the search command
+set incsearch
+
+" Briefly jump and show the matching bracket when inserting one.
+"set showmatch
+
+" Disable text wrap
+"set nowrap
 
 " Width switch
 """ --- raoni @ Mon Jan  6 09:53:22 BRST 2014
@@ -449,7 +107,7 @@ map <silent> <F8> :call Switchwidth()<cr>
 """ --- raoni END
 " Highlight 'textwidth' column
 set colorcolumn=+1
-function Switchwidth()
+function! Switchwidth()
     if &textwidth == 0
         set textwidth=120
     elseif &textwidth == 120
@@ -471,66 +129,8 @@ function Switchwidth()
     echo &textwidth " columns"
 endfunction
 
-" Spell switch
-""" --- raoni @ Mon Jan  6 09:53:22 BRST 2014
-""" Commented out next two lines to preserve initial setup per filetype, like
-""" gitcommit messages.
-"set spelllang=none
-"set nospell
-""" --- raoni END
-function Switchspell()
-    if &spelllang == "none"
-        set spelllang=en_us
-        set spell
-        echo "English"
-    elseif &spelllang == "en_us"
-        set spelllang=br,pt
-        set spell
-        echo "Brazil and Portuguese"
-    else
-        set nospell
-        set spelllang=none
-        echo "No spell"
-    endif
-endfunction
-
-" Highlight switch
-"let highlightstate = 0
-""highlight myhighlight ctermbg=blue guibg=grey
-"highlight link myhighlight Error
-"match myhighlight /^rabblerabblerabble$/
-"function Switchhighlight()
-"    if g:highlightstate == 0
-"        match myhighlight /^\t\+\| \+\t\| \+$\|\t\+$/
-"        echo "Highlight Tabs"
-"        let g:highlightstate = 1
-"    elseif g:highlightstate == 1
-"        match myhighlight /^ \+\| \+\t\| \+$\|\t\+$/
-"        echo "Highlight Spaces"
-"        let g:highlightstate = 2
-"    elseif g:highlightstate == 2
-"        match myhighlight /^rabblerabblerabble$/
-"        echo "No Highlight"
-"        let g:highlightstate = 0
-"    else
-"        match myhighlight /^rabblerabblerabble$/
-"        echo "No Highlight"
-"        let g:highlightstate = 0
-"    endif
-"endfunction
-
-"-------------------------------------------------------------------------------
-" Session RAONI 02
-"-------------------------------------------------------------------------------
-
-" ---
-" system-wide configurations that I'm putting here so It will work in all
-" systems. Someones I put my own values, so its just a remind that its settings
-" have system wide values not that what values they have.
-
-
-
-" --- find in archlinux AND ubuntu ---
+" Key mappings
+ map <silent> <F8> :call Switchwidth()<cr>
 
 " more powerful backspacing
 set backspace=indent,eol,start
@@ -546,21 +146,9 @@ set ruler
 " These are files we are not likely to want to edit or read.
 set suffixes=.bak,~,.swp,.o,.info,.aux,.log,.dvi,.bbl,.blg,.brf,.cb,.ind,.idx,.ilg,.inx,.out,.toc
 
-
-
-" --- find in ubuntu ---
-
-" Show matching brackets
-"set showmatch
-
-" ---
-
-" set color terminal capacity. We are forcing 8 colors because in archlinux vim
-" is too smart and see my xterm as 256 capable terminal em as soon we do anything
-" in vim it changes the color but it is kind of ugly because the theme is for 8
-" colors. In Debian there is this variant with 16 colors, we must test someday.
-set t_Co=8
-"set t_Co=16
+" set color terminal capacity
+" set t_Co=8
+set t_Co=16
 
 " column with line number
 set number
@@ -572,35 +160,20 @@ set mouse=a
 " don't recognize the xterm terminal version type.
 set ttymouse=xterm2
 
-" altomatic load syntax highlight
+" automatic load syntax highlight
 syntax on
-
-" use Vim defaults instead of 100% vi compatibility (needed for vimwiki)
-" Do not set it here, see the begining of the file
-"set nocompatible
 
 "to load plugin files for specific file types (needed for vimwiki)
 filetype plugin on
 
-" set fold column & folded lines color to red on black
-highlight CustomFoldColor term=italic cterm=NONE ctermfg=DarkCyan ctermbg=NONE gui=italic guifg=DarkCyan guibg=NONE
-highlight! link FoldColumn CustomFoldColor
-highlight! link Folded     CustomFoldColor
-" set fold column visible with width of 2
-set foldcolumn=2
-
 " set status line for the current buffer window to better discern the active
-" window in split windows. 
-hi StatusLine ctermfg=DarkYellow
+" window in split windows.
+hi StatusLine ctermfg=DarkGreen
 
 " map up and down keys to move up and down by visible lines not the actual real
 " lines (aka. separated by linebreak) (only works in command mode)
 map <Up> gk
 map <Down> gj
-
-" map up and down in insert mode (from Maxiwell)
-"imap <up> <esc>gk<insert><right>
-"imap <down> <esc>gj<insert><right>
 
 " remap j/k the same as up/down, but not in count commands.
 " From: http://blog.petrzemek.net/2016/04/06/things-about-vim-i-wish-i-knew-earlier/
@@ -614,29 +187,11 @@ let c_space_errors = 1
 " Show partial command (as you type) in the last line of the screen
 set  showcmd
 
-" TabComplete like bash (from Maxiwell)
-"set wildmode=longest,list,full
-"set wildmenu
-
-" for when you open a file without write permision and you need to a sudo. (from Maxiwell)
-"cmap w!! %!sudo tee % > /dev/null
-
-" better "go back the last jump" because in my keyboard configuration in order
-" to type '' one have to press '<Space>'<Space>, and 4 keystrokes is too much.
-" Since pressing '' result in ´, we are mapping  this to the jump back.
-map ´ ''
-
-" take from vim help ":help g??". make a map for this.
-" To turn one line into title caps, make every first letter of a word
-" uppercase: >
-" :s/\v<(.)(\w*)/\u\1\L\2/g
-
 " better highlight for vimdiff when using syntax highlight
 highlight DiffAdd    term=bold    cterm=NONE ctermfg=7 ctermbg=4          guifg=White guibg=LightBlue
 highlight DiffChange term=bold    cterm=NONE ctermfg=7 ctermbg=5          guifg=White guibg=LightMagenta
 highlight DiffDelete term=bold    cterm=NONE ctermfg=7 ctermbg=6 gui=bold guifg=Blue  guibg=LightCyan
 highlight DiffText   term=reverse cterm=bold ctermfg=7 ctermbg=1 gui=bold guifg=White guibg=Red
-
 
 " highlight for white speces at the end of lines. It will probably be overight
 " by the syntax highlight for the files, but is here as a reminder
@@ -649,7 +204,7 @@ highlight DiffText   term=reverse cterm=bold ctermfg=7 ctermbg=1 gui=bold guifg=
 let highlighteol_state = 0
 highlight link WhiteSpaceEOL Error
 match WhiteSpaceEOL /^THISshouldNEVERmatch_f5454108$/
-function SwitchHighlight_WhiteSpaceEOL()
+function! SwitchHighlight_WhiteSpaceEOL()
     if g:highlighteol_state == 0
         match WhiteSpaceEOL / \+$/
         echo "White Space Highlight: EOL Tabs"
@@ -674,35 +229,9 @@ function SwitchHighlight_WhiteSpaceEOL()
     let g:highlightsol_state = 0
 endfunction
 
-let highlightsol_state = 0
-"highlight WhiteSpaceSOL ctermbg=blue guibg=grey
-highlight link WhiteSpaceSOL Error
-match WhiteSpaceSOL /^THISshouldNEVERmatch_f5454108$/
-function SwitchHighlight_WhiteSpaceSOL()
-    if g:highlightsol_state == 0
-        match WhiteSpaceSOL /^\t\+\| \+\t\| \+$\|\t\+$/
-        echo "SOL Highlight: Tabs"
-        let g:highlightsol_state = 1
-    elseif g:highlightsol_state == 1
-        match WhiteSpaceSOL /^ \+\| \+\t\| \+$\|\t\+$/
-        echo "SOL Highlight: Spaces"
-        let g:highlightsol_state = 2
-    elseif g:highlightsol_state == 2
-        match WhiteSpaceSOL /^THISshouldNEVERmatch_f5454108$/
-        echo "SOL Highlight: OFF"
-        let g:highlightsol_state = 0
-    else
-        match WhiteSpaceSOL /^THISshouldNEVERmatch_f5454108$/
-        echo "SOL Highlight: OFF"
-        let g:highlightsol_state = 0
-    endif
-    let g:highlighteol_state = 0
-endfunction
-
 " Map for easy toggle of wrap text.
 map <silent> <F5> :set wrap!<cr>
 map <silent> <F6> :call SwitchHighlight_WhiteSpaceSOL()<cr>
-map <silent> <F7> :call SwitchHighlight_WhiteSpaceEOL()<cr>
 
 "-------------------------------------------------------------------------------
 " Raoni: Macros for beatifull text editing in VIM. Setup on demand.
@@ -720,25 +249,6 @@ set autoindent
 
 " Enable justify for paragraph formating. Use  '_j' to do the job
 "runtime macros/justify.vim
-
-
-command Textmode call ToggleTextMode()
-function ToggleTextMode()
-    if !exists("b:editText") || !b:editText
-        set textwidth=66
-        set autoindent
-        runtime macros/justify.vim
-
-        let b:editText=1
-        echo "Textmode enabled"
-    else
-        set textwidth=0
-        set noautoindent
-
-        let b:editText=0
-        echo "Textmode disabled"
-    endif
-endfunction
 
 " from vim-help: Every wrapped line will continue visually indented (same
 " amount of space as the beginning of that line), thus preserving horizontal
@@ -795,76 +305,3 @@ set highlight+=8:WarningMsg  " Use a new highlight
 "  nbsp x4: "    "
 " space x4: "    "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-
-function SwitchIndent()
-    if !exists("b:indenttype")
-        let b:indenttype = 0
-
-        let b:save_expandtab   = &l:expandtab
-        let b:save_smarttab    = &l:smarttab
-        let b:save_tabstop     = &l:tabstop
-        let b:save_shiftwidth  = &l:shiftwidth
-        let b:save_softtabstop = &l:softtabstop
-    endif
-
-    if b:indenttype == 0
-        echo "Indent Style: 2 (space)"
-        let b:indenttype += 1
-
-        let b:save_expandtab   = &l:expandtab
-        let b:save_smarttab    = &l:smarttab
-        let b:save_tabstop     = &l:tabstop
-        let b:save_shiftwidth  = &l:shiftwidth
-        let b:save_softtabstop = &l:softtabstop
-
-        let &l:expandtab   = 1
-        let &l:smarttab    = 0
-        let &l:tabstop     = 8
-        let &l:shiftwidth  = 2
-        let &l:softtabstop = 2
-
-    elseif b:indenttype == 1
-        echo "Indent Style: 4 (space)"
-        let b:indenttype += 1
-
-        let &l:expandtab   = 1
-        let &l:smarttab    = 0
-        let &l:tabstop     = 8
-        let &l:shiftwidth  = 4
-        let &l:softtabstop = 4
-
-    elseif b:indenttype == 2
-        echo "Indent Style: 8 (space)"
-        let b:indenttype += 1
-
-        let &l:expandtab   = 1
-        let &l:smarttab    = 0
-        let &l:tabstop     = 8
-        let &l:shiftwidth  = 8
-        let &l:softtabstop = 8
-
-    elseif b:indenttype == 3
-        echo "Indent Style: 8 (tab)"
-        let b:indenttype += 1
-
-        let &l:expandtab   = 0
-        let &l:smarttab    = 0
-        let &l:tabstop     = 8
-        let &l:shiftwidth  = 8
-        let &l:softtabstop = 8
-
-    else
-        echo "Indent Style: ORIGINAL"
-        let b:indenttype = 0
-
-        let &l:expandtab   = b:save_expandtab
-        let &l:smarttab    = b:save_smarttab
-        let &l:tabstop     = b:save_tabstop
-        let &l:shiftwidth  = b:save_shiftwidth
-        let &l:softtabstop = b:save_softtabstop
-    endif
-endfunction
-
-" Map for easy toggle ident tipes.
-map <silent> <F9> :call SwitchIndent()<cr>

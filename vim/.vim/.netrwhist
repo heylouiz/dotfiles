@@ -1,0 +1,8 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =6
+let g:netrw_dirhist_1='/home/tc.luizs'
+let g:netrw_dirhist_2='/home/tc.luizs/work/AtualizadorFw/res/img'
+let g:netrw_dirhist_3='/home/tc.luizs/work/xcpwdm/src/libframeworkppm3/thirdparty'
+let g:netrw_dirhist_4='/home/tc.luizs/.tmux/plugins/tmux-onedark-theme'
+let g:netrw_dirhist_5='/home/tc.luizs/.vim'
+let g:netrw_dirhist_6='/home/tc.luizs/work/ppm3_tester'
