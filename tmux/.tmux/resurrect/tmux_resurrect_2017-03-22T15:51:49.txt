@@ -1,8 +1,0 @@
-pane	0	1	:ssh	0	:	1	:/home/tc.luizs	1	ssh	:ssh luizs@10.202.36.174
-pane	0	2	:ssh	0	:-	1	:/home/tc.luizs	1	ssh	:ssh pi@heylouiz.duckdns.org -D9999 -q
-pane	0	2	:ssh	0	:-	2	:/home/tc.luizs	0	bash	:
-pane	0	3	:bash	1	:*	1	:/home/tc.luizs	1	bash	:
-window	0	1	0	:	d25d,213x59,0,0,0
-window	0	2	0	:-	a392,213x59,0,0{106x59,0,0,1,106x59,107,0,3}
-window	0	3	1	:*	d261,213x59,0,0,4
-state	0	
