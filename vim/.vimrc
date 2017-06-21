@@ -17,6 +17,19 @@ Plugin 'VundleVim/Vundle.vim'
 " NerdTree
 Plugin 'scrooloose/nerdtree'
 
+" Vim Airline
+Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
+
+" Vim Fugitive
+Plugin 'tpope/vim-fugitive'
+
+" CtrlP
+Plugin 'ctrlpvim/ctrlp.vim'
+
+" Tagbar
+Plugin 'majutsushi/tagbar'
+
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -30,8 +43,28 @@ filetype plugin indent on    " required
 " :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
 "
 " see :h vundle for more details or wiki for FAQ
-" Put your non-Plugin stuff after this line
 
+" Vim Airline configuration
+set laststatus=2
+let g:airline_powerline_fonts = 1
+let g:airline#extensions#tabline#buffer_nr_show = 1
+" Enable the list of buffers
+let g:airline#extensions#tabline#enabled = 1
+
+" Show just the filename
+let g:airline#extensions#tabline#fnamemod = ':t'
+
+" NERDTree configuration
+
+"" Ctrl-n to open/close NERDTree
+map <C-n> :NERDTreeToggle<CR>
+
+" TagBar configuration
+
+nmap <F9> :TagbarToggle<CR>
+
+" Put your non-Plugin stuff after this line
+" -----------------------------------------------------------------------------
 
 " change ~/.viminfo to a more convenient place
 set viminfo+=n~/.vim/viminfo
@@ -229,10 +262,6 @@ function! SwitchHighlight_WhiteSpaceEOL()
     let g:highlightsol_state = 0
 endfunction
 
-" Map for easy toggle of wrap text.
-map <silent> <F5> :set wrap!<cr>
-map <silent> <F6> :call SwitchHighlight_WhiteSpaceSOL()<cr>
-
 "-------------------------------------------------------------------------------
 " Raoni: Macros for beatifull text editing in VIM. Setup on demand.
 "-------------------------------------------------------------------------------
@@ -270,38 +299,133 @@ set list
 set listchars=tab:▸\ ,trail:␣,nbsp:⍽
 set highlight+=8:WarningMsg  " Use a new highlight
 
-" UNICODE full listchars
-"set listchars=eol:⏎,tab:␉·,space:␠,trail:␣,extends:»,precedes:«,conceal:©,nbsp:␣
-" ASCCI full listchars
-"set listchars=eol:$,tab:>-,space:.,trail:~,extends:>,precedes:<,conceal:%,nbsp:\#
+"--------------------------------------------------------------------------------
+" ctags and cscope
+"--------------------------------------------------------------------------------
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Simbols Table to use in "meta" chars, like showbreak and listchars. Using
-" two types, UNICODE preferable) and ASCII (compatible) chars.
-" OBS: pais of chars may be put together and between single quotes to make it
-" easer to see. Otherwise options are separeted with space
-"
-" +-----------+-------+-------------------------------+
-" | Use/Desc. : ASCII | Unicode                       |
-" |-----------+-------+-------------------------------|
-" |       eol : $     | ␊ ␍ ␤ ↵ ⏎ ↲ ↩                 |
-" |       tab : >-    | ␉ ⌦ ▶▷ ▸▹ ►▻ → ⇥ ↦ ⇉ ⇶ ⊢ '├─' | Pairs: 'x ' or 'x ·' or
-" |     space : .     | ␠ ␣ ·                         |
-" |     trail : ~     | ␠ ␣ × · ░ █ ■ □ ▪ △ ◇         | ◼◻ ◾◽ ■□ ▪▫
-" |      nbsp : # _ ? | ␠ ␟ ⍽ ␣ ⎈ ⌄ · ⚡ ⚠             | ∐ ⊔ ⊢ ⓢ ▭ ▬
-" |   extends : >     | »                             |
-" |  precedes : <     | «                             |
-" |   conceal : %     | ©                             |
-" |                                                   |
-" | showbreak : ++    | '↪ '                          |
-" +-----------+-------+-------------------------------+
-"
-" Sample
-" ------
-" Obs: you need to ":set list" and ":set listchars=" as apropriated to see all
-" characters bellow
-"   tab x4: "                "
-" trail x4: "    
-"  nbsp x4: "    "
-" space x4: "    "
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" set the ctags file name
+set tags=tags,ctags,.tags,.ctags
+
+" Use .../tags in ancestor of source directory.
+" useful when you have source tree eight fathom deep,
+" an exercise in Vim loops.
+let parent=1
+let local_tags = ".tags/ctags"
+let local_cscope = ".tags/cscope.out"
+exe ":set tags+=".local_tags
+exe ":cs add ".local_cscope
+
+while parent <= 8
+  let local_tags = "../". local_tags
+  let local_cscope = "../". local_cscope
+  exe ":set tags+=".local_tags
+  exe ":cs add ".local_cscope
+  let parent = parent+1
+endwhile
+
+" cscope map
+" s: Find this C symbol
+nmap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>
+" g: Find this definition
+nmap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR>
+" c: Find functions calling this function
+nmap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR>
+" t: Find this text string
+nmap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR>
+" e: Find this egrep pattern
+nmap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR>
+" f: Find this file
+nmap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
+" i: Find files #including this file
+nmap <C-\>i :cs find i [/]?<C-R>=expand('%:t')<CR><CR>
+" d: Find functions called by this function
+nmap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>
+" a: Find places where this symbol is assigned a value
+nmap <C-\>a :cs find a <C-R>=expand("<cword>")<CR><CR>
+
+" Find the file that you type. Some projects copy the header
+" files in different places (/include, /refs, /releases). So
+" with this shortcut, you can find copies of files using the
+" CSCOPE database (CtrlP fails when a project has many .git
+" repository). Use % to search the current filename
+nmap <C-\>F :cs find f
+
+function! SwitchIndent()
+    if !exists("b:indenttype")
+        let b:indenttype = 0
+
+        let b:save_expandtab   = &l:expandtab
+        let b:save_smarttab    = &l:smarttab
+        let b:save_tabstop     = &l:tabstop
+        let b:save_shiftwidth  = &l:shiftwidth
+        let b:save_softtabstop = &l:softtabstop
+    endif
+
+    if b:indenttype == 0
+        echo "Indent Style: 2 (space)"
+        let b:indenttype += 1
+
+        let b:save_expandtab   = &l:expandtab
+        let b:save_smarttab    = &l:smarttab
+        let b:save_tabstop     = &l:tabstop
+        let b:save_shiftwidth  = &l:shiftwidth
+        let b:save_softtabstop = &l:softtabstop
+
+        let &l:expandtab   = 1
+        let &l:smarttab    = 0
+        let &l:tabstop     = 8
+        let &l:shiftwidth  = 2
+        let &l:softtabstop = 2
+
+    elseif b:indenttype == 1
+        echo "Indent Style: 4 (space)"
+        let b:indenttype += 1
+
+        let &l:expandtab   = 1
+        let &l:smarttab    = 0
+        let &l:tabstop     = 8
+        let &l:shiftwidth  = 4
+        let &l:softtabstop = 4
+
+    elseif b:indenttype == 2
+        echo "Indent Style: 8 (space)"
+        let b:indenttype += 1
+
+        let &l:expandtab   = 1
+        let &l:smarttab    = 0
+        let &l:tabstop     = 8
+        let &l:shiftwidth  = 8
+        let &l:softtabstop = 8
+
+    elseif b:indenttype == 3
+        echo "Indent Style: 8 (tab)"
+        let b:indenttype += 1
+
+        let &l:expandtab   = 0
+        let &l:smarttab    = 0
+        let &l:tabstop     = 8
+        let &l:shiftwidth  = 8
+        let &l:softtabstop = 8
+
+    else
+        echo "Indent Style: ORIGINAL"
+        let b:indenttype = 0
+
+        let &l:expandtab   = b:save_expandtab
+        let &l:smarttab    = b:save_smarttab
+        let &l:tabstop     = b:save_tabstop
+        let &l:shiftwidth  = b:save_shiftwidth
+        let &l:softtabstop = b:save_softtabstop
+    endif
+endfunction
+
+" Map for easy toggle ident tipes.
+map <silent> <F10> :call SwitchIndent()<cr>
+
+
+" Move between buffers using f5 and f6
+nmap <F5> :bprev<CR>
+nmap <F6> :bnext<CR>
+
+set wildmenu
+set wildmode=longest,list
