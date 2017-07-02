@@ -1,0 +1,21 @@
+# This is Git's per-user configuration file.
+[user]
+    name = Luiz Silva
+    email = luizfrdasilva@gmail.com
+[color]
+    ui = auto
+
+[alias]
+    puff = pull --ff-only
+    ll = log --oneline --decorate --all --graph
+    ls = log --oneline --decorate --all --graph --stat
+    lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+    lola = log --graph --all --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+    st = status --short --branch
+    sa = status --short --branch --ignored
+
+[core]
+    editor = vim
+[credential]
+    helper = cache
+
