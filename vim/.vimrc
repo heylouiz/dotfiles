@@ -1,6 +1,6 @@
-"-------------------------------------------------------------------------------
-" Vundle
-"-------------------------------------------------------------------------------
+"--------"
+" VUNDLE "
+"--------"
 
 set nocompatible              " be iMproved, required
 filetype off                  " required
@@ -30,6 +30,12 @@ Plugin 'ctrlpvim/ctrlp.vim'
 " Tagbar
 Plugin 'majutsushi/tagbar'
 
+" Ale (linter)
+Plugin 'w0rp/ale'
+
+" Linediff
+Plugin 'AndrewRadev/linediff.vim'
+
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -44,36 +50,106 @@ filetype plugin indent on    " required
 "
 " see :h vundle for more details or wiki for FAQ
 
+"----------------------"
+" PLUGIN CONFIGURATION "
+"----------------------"
+
 " Vim Airline configuration
+let g:airline_theme='papercolor'
 set laststatus=2
+set nocompatible
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#buffer_nr_show = 1
+let g:Powerline_symbols = 'fancy'
+
 " Enable the list of buffers
 let g:airline#extensions#tabline#enabled = 1
 
 " Show just the filename
 let g:airline#extensions#tabline#fnamemod = ':t'
 
-" NERDTree configuration
+" Enable Ale on airline
+let g:airline#extensions#ale#enabled = 1
 
-"" Ctrl-n to open/close NERDTree
+" NERDTree configuration
+" Ctrl-n to open/close NERDTree
 map <C-n> :NERDTreeToggle<CR>
 
 " TagBar configuration
-
 nmap <F9> :TagbarToggle<CR>
 
-" Put your non-Plugin stuff after this line
-" -----------------------------------------------------------------------------
+" ctags and cscope configuration
+
+" set the ctags file name
+set tags=tags,ctags,.tags,.ctags
+
+
+" Use .../tags in ancestor of source directory.
+" useful when you have source tree eight fathom deep,
+" an exercise in Vim loops.
+let parent=1
+let local_tags = ".tags/ctags"
+let local_cscope = ".tags/cscope.out"
+exe ":set tags+=".local_tags
+exe ":cs add ".local_cscope
+
+while parent <= 8
+  let local_tags = "../". local_tags
+  let local_cscope = "../". local_cscope
+  exe ":set tags+=".local_tags
+  exe ":cs add ".local_cscope
+  let parent = parent+1
+endwhile
+
+" cscope map
+" s: Find this C symbol
+nmap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>
+" g: Find this definition
+nmap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR>	
+" c: Find functions calling this function
+nmap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR>	
+" t: Find this text string
+nmap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR>	
+" e: Find this egrep pattern
+nmap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR>	
+" f: Find this file
+nmap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR>	
+" i: Find files #including this file
+nmap <C-\>i :cs find i [/]?<C-R>=expand('%:t')<CR><CR>
+" d: Find functions called by this function
+nmap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>
+" a: Find places where this symbol is assigned a value
+nmap <C-\>a :cs find a <C-R>=expand("<cword>")<CR><CR>
+
+" Find the file that you type. Some projects copy the header
+" files in different places (/include, /refs, /releases). So 
+" with this shortcut, you can find copies of files using the 
+" CSCOPE database (CtrlP fails when a project has many .git 
+" repository). Use % to search the current filename 
+nmap <C-\>F :cs find f
+
+"----------------------"
+" VIM CONFIGURATION "
+"----------------------"
 
 " change ~/.viminfo to a more convenient place
 set viminfo+=n~/.vim/viminfo
+
+set encoding=utf-8
+
+set guifont=DejaVu\ Sans\ Mono\ for\ Powerline
 
 "------------
 " Colors
 "------------
 " Force the default colorscheme before anything else
 " colorscheme default
+
+" Dracula colorscheme
+"colorscheme dracula
+
+" Seabird colorscheme
+" colorscheme petrel
 
 " Change line number column to white
 highlight LineNr ctermfg=white
@@ -203,6 +279,9 @@ filetype plugin on
 " window in split windows.
 hi StatusLine ctermfg=DarkGreen
 
+" Open vertical splits to the right
+set splitright
+
 " map up and down keys to move up and down by visible lines not the actual real
 " lines (aka. separated by linebreak) (only works in command mode)
 map <Up> gk
@@ -219,6 +298,10 @@ let c_gnu = 1
 let c_space_errors = 1
 " Show partial command (as you type) in the last line of the screen
 set  showcmd
+
+" Any buffer can be hidden (keeping its changes) without first writing
+" the buffer to a file
+set hidden
 
 " better highlight for vimdiff when using syntax highlight
 highlight DiffAdd    term=bold    cterm=NONE ctermfg=7 ctermbg=4          guifg=White guibg=LightBlue
@@ -299,57 +382,6 @@ set list
 set listchars=tab:▸\ ,trail:␣,nbsp:⍽
 set highlight+=8:WarningMsg  " Use a new highlight
 
-"--------------------------------------------------------------------------------
-" ctags and cscope
-"--------------------------------------------------------------------------------
-
-" set the ctags file name
-set tags=tags,ctags,.tags,.ctags
-
-" Use .../tags in ancestor of source directory.
-" useful when you have source tree eight fathom deep,
-" an exercise in Vim loops.
-let parent=1
-let local_tags = ".tags/ctags"
-let local_cscope = ".tags/cscope.out"
-exe ":set tags+=".local_tags
-exe ":cs add ".local_cscope
-
-while parent <= 8
-  let local_tags = "../". local_tags
-  let local_cscope = "../". local_cscope
-  exe ":set tags+=".local_tags
-  exe ":cs add ".local_cscope
-  let parent = parent+1
-endwhile
-
-" cscope map
-" s: Find this C symbol
-nmap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>
-" g: Find this definition
-nmap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR>
-" c: Find functions calling this function
-nmap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR>
-" t: Find this text string
-nmap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR>
-" e: Find this egrep pattern
-nmap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR>
-" f: Find this file
-nmap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
-" i: Find files #including this file
-nmap <C-\>i :cs find i [/]?<C-R>=expand('%:t')<CR><CR>
-" d: Find functions called by this function
-nmap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>
-" a: Find places where this symbol is assigned a value
-nmap <C-\>a :cs find a <C-R>=expand("<cword>")<CR><CR>
-
-" Find the file that you type. Some projects copy the header
-" files in different places (/include, /refs, /releases). So
-" with this shortcut, you can find copies of files using the
-" CSCOPE database (CtrlP fails when a project has many .git
-" repository). Use % to search the current filename
-nmap <C-\>F :cs find f
-
 function! SwitchIndent()
     if !exists("b:indenttype")
         let b:indenttype = 0
@@ -422,6 +454,7 @@ endfunction
 " Map for easy toggle ident tipes.
 map <silent> <F10> :call SwitchIndent()<cr>
 
+silent bufdo call SwitchIndent()
 
 " Move between buffers using f5 and f6
 nmap <F5> :bprev<CR>
@@ -429,3 +462,9 @@ nmap <F6> :bnext<CR>
 
 set wildmenu
 set wildmode=longest,list
+
+" Run shell commands in split windows
+command! -nargs=* Shell set splitright | vnew | r! <args>
+
+" Always have at least 5 lines below cursor (useful for search)
+set scrolloff=5

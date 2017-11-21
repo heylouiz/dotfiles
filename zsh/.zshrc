@@ -90,3 +90,9 @@ alias h=' h'
 h() {
   history | grep "$1"
 }
+
+# Enable home and end keys
+bindkey "${terminfo[khome]}" beginning-of-line
+bindkey "${terminfo[kend]}" end-of-line
+bindkey  "^[[H"   beginning-of-line
+bindkey  "^[[F"   end-of-line
