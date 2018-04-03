@@ -36,6 +36,14 @@ Plugin 'w0rp/ale'
 " Linediff
 Plugin 'AndrewRadev/linediff.vim'
 
+" Peekaboo
+Plugin 'junegunn/vim-peekaboo'
+
+" Papercolor colorscheme
+Plugin 'NLKNguyen/papercolor-theme'
+
+" C Syntax highlight
+Plugin 'NLKNguyen/c-syntax.vim'
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -63,7 +71,7 @@ let g:airline#extensions#tabline#buffer_nr_show = 1
 let g:Powerline_symbols = 'fancy'
 
 " Enable the list of buffers
-let g:airline#extensions#tabline#enabled = 1
+" let g:airline#extensions#tabline#enabled = 1
 
 " Show just the filename
 let g:airline#extensions#tabline#fnamemod = ':t'
@@ -128,6 +136,20 @@ nmap <C-\>a :cs find a <C-R>=expand("<cword>")<CR><CR>
 " repository). Use % to search the current filename 
 nmap <C-\>F :cs find f
 
+let g:PaperColor_Theme_Options = {
+  \   'language': {
+  \     'python': {
+  \       'highlight_builtins' : 1
+  \     },
+  \     'cpp': {
+  \       'highlight_standard_library': 1
+  \     },
+  \     'c': {
+  \       'highlight_builtins' : 1
+  \     }
+  \   }
+  \ }
+
 "----------------------"
 " VIM CONFIGURATION "
 "----------------------"
@@ -142,54 +164,13 @@ set guifont=DejaVu\ Sans\ Mono\ for\ Powerline
 "------------
 " Colors
 "------------
-" Force the default colorscheme before anything else
-" colorscheme default
+set t_Co=256
 
-" Dracula colorscheme
-"colorscheme dracula
-
-" Seabird colorscheme
-" colorscheme petrel
+set background=dark
+colorscheme PaperColor
 
 " Change line number column to white
 highlight LineNr ctermfg=white
-
-highlight Search cterm=NONE ctermfg=black ctermbg=yellow
-
-"-------------------------------------------------------------------------------
-" VIM highlight variable under cursor like in netbeans
-" From: http://stackoverflow.com/questions/1551231/vim-highlight-variable-under-cursor-like-in-netbeans
-"-------------------------------------------------------------------------------
-
-":autocmd CursorMoved * silent! exe printf('match IncSearch /\<%s\>/', expand('<cword>'))
-
-"-------------------------------------------------------------------------------
-" Auto highlight current word when idle
-" From: http://vim.wikia.com/wiki/Auto_highlight_current_word_when_idle
-"-------------------------------------------------------------------------------
-
-" Highlight all instances of word under cursor, when idle.
-" Useful when studying strange source code.
-" Type z/ to toggle highlighting on/off.
-nnoremap z/ :if AutoHighlightToggle()<Bar>set hls<Bar>endif<CR>
-function! AutoHighlightToggle()
-  let @/ = ''
-  if exists('#auto_highlight')
-    au! auto_highlight
-    augroup! auto_highlight
-    setl updatetime=4000
-    echo 'Highlight current word: off'
-    return 0
-  else
-    augroup auto_highlight
-      au!
-      au CursorHold * let @/ = '\<'.expand('<cword>').'\>'
-    augroup end
-    setl updatetime=500
-    echo 'Highlight current word: ON'
-    return 1
-  endif
-endfunction
 
 " Default behavior
 
@@ -253,11 +234,7 @@ set ruler
 
 " Suffixes that get lower priority when doing tab completion for filenames.
 " These are files we are not likely to want to edit or read.
-set suffixes=.bak,~,.swp,.o,.info,.aux,.log,.dvi,.bbl,.blg,.brf,.cb,.ind,.idx,.ilg,.inx,.out,.toc
-
-" set color terminal capacity
-" set t_Co=8
-set t_Co=16
+set suffixes=.bak,~,.swp,.o,.d,.info,.aux,.log,.dvi,.bbl,.blg,.brf,.cb,.ind,.idx,.ilg,.inx,.out,.toc
 
 " column with line number
 set number
@@ -274,10 +251,6 @@ syntax on
 
 "to load plugin files for specific file types (needed for vimwiki)
 filetype plugin on
-
-" set status line for the current buffer window to better discern the active
-" window in split windows.
-hi StatusLine ctermfg=DarkGreen
 
 " Open vertical splits to the right
 set splitright
@@ -304,57 +277,10 @@ set  showcmd
 set hidden
 
 " better highlight for vimdiff when using syntax highlight
-highlight DiffAdd    term=bold    cterm=NONE ctermfg=7 ctermbg=4          guifg=White guibg=LightBlue
-highlight DiffChange term=bold    cterm=NONE ctermfg=7 ctermbg=5          guifg=White guibg=LightMagenta
-highlight DiffDelete term=bold    cterm=NONE ctermfg=7 ctermbg=6 gui=bold guifg=Blue  guibg=LightCyan
-highlight DiffText   term=reverse cterm=bold ctermfg=7 ctermbg=1 gui=bold guifg=White guibg=Red
-
-" highlight for white speces at the end of lines. It will probably be overight
-" by the syntax highlight for the files, but is here as a reminder
-"syntax match WhiteSpaceEOL excludenl "\s\+$"
-"highlight link WhiteSpaceEOL Error
-
-" TODO: Check why the syntax of my old hightlight for space at the end is
-" diferent from Gabs Switchhighlight() function.
-" TODO: Unify with Gabs Switchhighlight(). Probably better.
-let highlighteol_state = 0
-highlight link WhiteSpaceEOL Error
-match WhiteSpaceEOL /^THISshouldNEVERmatch_f5454108$/
-function! SwitchHighlight_WhiteSpaceEOL()
-    if g:highlighteol_state == 0
-        match WhiteSpaceEOL / \+$/
-        echo "White Space Highlight: EOL Tabs"
-        let g:highlighteol_state = 1
-    elseif g:highlighteol_state == 1
-        match WhiteSpaceEOL /\t\+$/
-        echo "White Space Highlight: EOL Spaces"
-        let g:highlighteol_state = 2
-    elseif g:highlighteol_state == 2
-        match WhiteSpaceEOL /\s\+$/
-        echo "White Space Highlight: EOL Spaces/Tabs"
-        let g:highlighteol_state = 3
-    elseif g:highlighteol_state == 3
-        match WhiteSpaceEOL /^THISshouldNEVERmatch_f5454108$/
-        echo "White Space Highlight: OFF"
-        let g:highlighteol_state = 0
-    else
-        match WhiteSpaceEOL /^THISshouldNEVERmatch_f5454108$/
-        echo "White Space Highlight: OFF"
-        let g:highlighteol_state = 0
-    endif
-    let g:highlightsol_state = 0
-endfunction
-
-"-------------------------------------------------------------------------------
-" Raoni: Macros for beatifull text editing in VIM. Setup on demand.
-"-------------------------------------------------------------------------------
-
-" Associate *.md with markdown filetype (vim default *.md to modula2)
-" TODO: NOT WORKING
-au BufRead,BufNewFile *.md setfiletype markdown
-
-" use 66 letlers in paragraph lenght when formating.
-"set textwidth=66
+" highlight DiffAdd    term=bold    cterm=NONE ctermfg=7 ctermbg=4          guifg=White guibg=LightBlue
+" highlight DiffChange term=bold    cterm=NONE ctermfg=7 ctermbg=5          guifg=White guibg=LightMagenta
+" highlight DiffDelete term=bold    cterm=NONE ctermfg=7 ctermbg=6 gui=bold guifg=Blue  guibg=LightCyan
+" highlight DiffText   term=reverse cterm=bold ctermfg=7 ctermbg=1 gui=bold guifg=White guibg=Red
 
 " set autoindent to indent paragraph when formating.
 set autoindent
@@ -381,6 +307,13 @@ set highlight+=@:Folded  " Use a new highlight
 set list
 set listchars=tab:▸\ ,trail:␣,nbsp:⍽
 set highlight+=8:WarningMsg  " Use a new highlight
+
+" Indentation related configs
+let &l:expandtab   = 1
+let &l:smarttab    = 0
+let &l:tabstop     = 8
+let &l:shiftwidth  = 2
+let &l:softtabstop = 2
 
 function! SwitchIndent()
     if !exists("b:indenttype")
@@ -454,12 +387,7 @@ endfunction
 " Map for easy toggle ident tipes.
 map <silent> <F10> :call SwitchIndent()<cr>
 
-silent bufdo call SwitchIndent()
-
-" Move between buffers using f5 and f6
-nmap <F5> :bprev<CR>
-nmap <F6> :bnext<CR>
-
+" Make tab to complete commands works like in bash
 set wildmenu
 set wildmode=longest,list
 
