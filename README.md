@@ -2,8 +2,8 @@
 
 Terminal colors:
 
-![colors](https://raw.githubusercontent.com/heylouiz/dotfiles/master/colors/term_colors.png)
+![colors](terminal/images/preview.png?raw=true)
+
+For more information about my terminal configuration see this [README.md](https://github.com/heylouiz/dotfiles/blob/master/terminal/README.md)
 
 My dotfiles, thats it :P
-
-Thanks to [rff](https://github.com/rff) for the .vimrc
