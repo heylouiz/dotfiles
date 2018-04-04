@@ -9,6 +9,7 @@ On folder **colors** there's a screenshot of my configuration and a XResource fi
 The colorscheme is based on [Vim papercolor-theme](https://github.com/NLKNguyen/papercolor-theme).
 
 To import the terminal configuration to your Gnome terminal:
+
 ```gnome-terminal-profile import Papercolor```
 
 Where Papercolor is the name of my exported profile
