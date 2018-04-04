@@ -1,0 +1,51 @@
+URxvt*termName:  screen-256color
+
+URxvt*geometry:  100x40
+
+URxvt*iconFile:  /usr/share/icons/gnome/32x32/apps/gnome-terminal.png
+
+! PaperColor Theme
+! special
+*.foreground:   #F2F2F2
+*.background:   #1c1c1c
+*.cursorColor:  #d0d0d0
+
+! black
+*.color0:       #2C2C2C
+*.color8:       #969694
+
+! red
+*.color1:       #C62828
+*.color9:       #F15250
+
+! green
+*.color2:       #558B2E
+*.color10:      #86BD47
+
+! yellow
+*.color3:       #F9A825
+*.color11:      #F8E63A
+
+! blue
+*.color4:       #1565C1
+*.color12:      #77B2F6
+
+! magenta
+*.color5:       #793DA0
+*.color13:      #B963C8
+
+! cyan
+*.color6:       #00838F
+*.color14:      #25C3DC
+
+! white
+*.color7:       #FFFFFF
+*.color15:      #FFFFFF
+
+! Disable scroolbar
+URxvt*scrollBar: false
+
+! Font
+URxvt*font: xft:Hack:pixelsize=11:antialias=true:hinting=true
+URxvt*boldFont: xft:Hack:bold:pixelsize=11:antialias=true:hinting=true
+
