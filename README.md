@@ -5,6 +5,7 @@ Terminal colors:
 ![colors](terminal/images/preview.png?raw=true)
 
 Zsh:
+
 ![zsh](zsh/images/preview.png?raw=true)
 
 
