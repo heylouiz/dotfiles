@@ -102,3 +102,7 @@ bindkey "${terminfo[khome]}" beginning-of-line
 bindkey "${terminfo[kend]}" end-of-line
 bindkey  "^[[H"   beginning-of-line
 bindkey  "^[[F"   end-of-line
+
+s_shell () {
+  scrapy shell $1 -s USER_AGENT='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/65.0.3325.181 Chrome/65.0.3325.181 Safari/537.36' -s COOKIES_ENABLED=True
+}

@@ -44,6 +44,13 @@ Plugin 'NLKNguyen/papercolor-theme'
 
 " C Syntax highlight
 Plugin 'NLKNguyen/c-syntax.vim'
+
+" Python Syntax highlight
+Plugin 'hdima/python-syntax'
+
+" Vim cursorword, highlight ocurrences of word undercursor
+Plugin 'itchyny/vim-cursorword'
+
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -71,7 +78,7 @@ let g:airline#extensions#tabline#buffer_nr_show = 1
 let g:Powerline_symbols = 'fancy'
 
 " Enable the list of buffers
-" let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#enabled = 1
 
 " Show just the filename
 let g:airline#extensions#tabline#fnamemod = ':t'
@@ -149,6 +156,9 @@ let g:PaperColor_Theme_Options = {
   \     }
   \   }
   \ }
+
+" Enable python syntax highlight plugin
+let python_highlight_all = 1
 
 "----------------------"
 " VIM CONFIGURATION "
@@ -396,3 +406,10 @@ command! -nargs=* Shell set splitright | vnew | r! <args>
 
 " Always have at least 5 lines below cursor (useful for search)
 set scrolloff=5
+
+" Move between buffers using f3 and f4
+nmap <F3> :bprev<CR>
+nmap <F4> :bnext<CR>
+
+" Move between the last two buffers
+nmap <F5> :b#<CR>
