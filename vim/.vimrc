@@ -46,10 +46,22 @@ Plugin 'NLKNguyen/papercolor-theme'
 Plugin 'NLKNguyen/c-syntax.vim'
 
 " Python Syntax highlight
-Plugin 'hdima/python-syntax'
+Plugin 'vim-python/python-syntax'
 
 " Vim cursorword, highlight ocurrences of word undercursor
 Plugin 'itchyny/vim-cursorword'
+
+" Jedi-vim
+Plugin 'davidhalter/jedi-vim'
+
+" GitGutter
+Plugin 'airblade/vim-gitgutter'
+
+" Rainbow
+Plugin 'luochen1990/rainbow'
+
+" Pulse
+Plugin 'inside/vim-search-pulse'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -92,6 +104,15 @@ map <C-n> :NERDTreeToggle<CR>
 
 " TagBar configuration
 nmap <F9> :TagbarToggle<CR>
+
+" Jedi-vim configuration
+let g:jedi#popup_on_dot = 0
+
+" GitGutter
+set updatetime=1000 " Time to update marks
+
+" Enable Rainbow
+let g:rainbow_active = 1
 
 " ctags and cscope configuration
 
@@ -158,7 +179,7 @@ let g:PaperColor_Theme_Options = {
   \ }
 
 " Enable python syntax highlight plugin
-let python_highlight_all = 1
+let g:python_highlight_all = 1
 
 "----------------------"
 " VIM CONFIGURATION "
@@ -413,3 +434,29 @@ nmap <F4> :bnext<CR>
 
 " Move between the last two buffers
 nmap <F5> :b#<CR>
+
+" Pretty print json
+command! PrettyJson :%!python -m json.tool
+
+    let g:rainbow_conf = {
+          \    'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'firebrick'],
+          \    'ctermfgs': ['lightblue', 'lightyellow', 'lightcyan', 'lightmagenta'],
+          \    'operators': '_,_',
+          \    'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],
+          \    'separately': {
+          \        '*': {},
+          \        'tex': {
+          \            'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/'],
+          \        },
+          \        'lisp': {
+          \            'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'firebrick', 'darkorchid3'],
+          \        },
+          \        'vim': {
+          \            'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/', 'start=/{/ end=/}/ fold', 'start=/(/ end=/)/ containedin=vimFuncBody', 'start=/\[/ end=/\]/ containedin=vimFuncBody', 'start=/{/ end=/}/ fold containedin=vimFuncBody'],
+          \        },
+          \        'html': {
+          \            'parentheses': ['start=/\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>/ end=#</\z1># fold'],
+          \        },
+          \        'css': 0,
+          \    }
+          \}
