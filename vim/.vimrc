@@ -63,6 +63,9 @@ Plugin 'luochen1990/rainbow'
 " Pulse
 Plugin 'inside/vim-search-pulse'
 
+" Show indent guide
+Plugin 'nathanaelkane/vim-indent-guides'
+
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -98,6 +101,19 @@ let g:airline#extensions#tabline#fnamemod = ':t'
 " Enable Ale on airline
 let g:airline#extensions#ale#enabled = 1
 
+" Configure ALE linters
+let g:ale_linters = {'python': ['flake8']}
+
+" Configure ALE fixers
+let g:ale_fixers = {
+\   'python': [
+\       'isort',
+\       'yapf',
+\       'remove_trailing_lines',
+\       'trim_whitespace'
+\   ]
+\}
+
 " NERDTree configuration
 " Ctrl-n to open/close NERDTree
 map <C-n> :NERDTreeToggle<CR>
@@ -113,6 +129,9 @@ set updatetime=1000 " Time to update marks
 
 " Enable Rainbow
 let g:rainbow_active = 1
+
+" Configure Indent Guides
+let g:indent_guides_guide_size = 1
 
 " ctags and cscope configuration
 
@@ -460,3 +479,6 @@ command! PrettyJson :%!python -m json.tool
           \        'css': 0,
           \    }
           \}
+
+" Highlight current line
+set cursorline
