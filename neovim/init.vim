@@ -19,6 +19,7 @@ Plug 'neovim/nvim-lspconfig'
 Plug 'hrsh7th/nvim-compe'
 Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
 Plug 'junegunn/vim-peekaboo'
+Plug 'AndrewRadev/splitjoin.vim'
 " /\ Plugins /\
 "
 call plug#end()
